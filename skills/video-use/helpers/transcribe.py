@@ -34,15 +34,23 @@ SCRIBE_URL = "https://api.elevenlabs.io/v1/speech-to-text"
 
 
 def load_api_key() -> str:
-    for candidate in [Path(__file__).resolve().parent.parent / ".env", Path(".env")]:
+    # ~/.config/video-use/.env survives plugin updates (the plugin folder itself
+    # is replaced on every update, so a .env stored inside it would be lost).
+    candidates = [
+        Path.home() / ".config" / "video-use" / ".env",
+        Path(__file__).resolve().parent.parent / ".env",
+        Path(".env"),
+    ]
+    for candidate in candidates:
         if candidate.exists():
             for line in candidate.read_text().splitlines():
                 line = line.strip()
                 if not line or line.startswith("#") or "=" not in line:
                     continue
                 k, v = line.split("=", 1)
-                if k.strip() == "ELEVENLABS_API_KEY":
-                    return v.strip().strip('"').strip("'")
+                v = v.strip().strip('"').strip("'")
+                if k.strip() == "ELEVENLABS_API_KEY" and v:
+                    return v
     v = os.environ.get("ELEVENLABS_API_KEY", "")
     if not v:
         sys.exit("ELEVENLABS_API_KEY not found in .env or environment")

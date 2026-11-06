@@ -1,0 +1,16 @@
+{
+  "name": "video-use",
+  "owner": {
+    "name": "cryptogus056-beep"
+  },
+  "metadata": {
+    "description": "Private marketplace with the video-use plugin: conversation-driven video editing for Claude Code."
+  },
+  "plugins": [
+    {
+      "name": "video-use",
+      "source": "./",
+      "description": "Edit videos by conversation with Claude Code (ffmpeg + ElevenLabs Scribe)."
+    }
+  ]
+}

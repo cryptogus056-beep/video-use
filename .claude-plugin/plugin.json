@@ -1,0 +1,11 @@
+{
+  "name": "video-use",
+  "version": "0.1.0",
+  "description": "Edit videos by conversation: transcribe, cut filler, color grade, add animations and burn subtitles with ffmpeg + ElevenLabs Scribe.",
+  "author": {
+    "name": "Browser Use (original) / cryptogus056-beep (plugin packaging)"
+  },
+  "homepage": "https://github.com/browser-use/video-use",
+  "license": "MIT",
+  "keywords": ["video", "editing", "ffmpeg", "subtitles", "elevenlabs"]
+}

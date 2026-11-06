@@ -20,17 +20,36 @@ Cloud-hosted video-use is coming. [Join the waitlist at video-use.com](https://v
 - **Self-evaluates the rendered output** at every cut boundary before showing you anything
 - **Persists session memory** in `project.md` so next week's session picks up where you left off
 
+> **Esta es una copia privada de [browser-use/video-use](https://github.com/browser-use/video-use) (licencia MIT), empaquetada como plugin de Claude Code.**
+
+## Instalación como plugin de Claude Code
+
+Dentro de Claude Code (PC, web o sesión en la nube), escribe:
+
+```
+/plugin marketplace add cryptogus056-beep/video-use
+/plugin install video-use@video-use
+```
+
+Como el repositorio es privado, ese equipo necesita acceso a tu cuenta de GitHub (por ejemplo `gh auth login`). Para traer cambios nuevos: `/plugin marketplace update video-use`.
+
+Además necesitas, una sola vez por equipo:
+
+1. **ffmpeg** (`brew install ffmpeg` en Mac, `winget install Gyan.FFmpeg` en Windows, `sudo apt-get install -y ffmpeg` en Linux).
+2. **Librerías de Python**: `pip install requests librosa matplotlib pillow numpy`.
+3. **Clave de ElevenLabs** como variable de entorno `ELEVENLABS_API_KEY`, o en el archivo `~/.config/video-use/.env` con la línea `ELEVENLABS_API_KEY=...`. Nunca dentro del repo.
+
+Luego abre Claude Code en la carpeta de tus videos y pide: *"edita estos clips en un video de lanzamiento"*.
+
 ## Setup prompt
 
 Paste into Claude Code, Codex, Hermes, Openclaw, or any agent with shell access:
 
 ```text
-Set up https://github.com/browser-use/video-use for me.
+Set up https://github.com/cryptogus056-beep/video-use for me.
 
-Read install.md first to install this repo, wire up ffmpeg, register the skill with whichever agent you're running under, and set up the ElevenLabs API key — ask me to paste it when you need it. Then read SKILL.md for daily usage, and always read helpers/ because that's where the editing scripts live. After install, don't transcribe anything on your own — just tell me it's ready and wait for me to drop footage into a folder.
+Read install.md first to register the skill (as a Claude Code plugin if you're Claude Code), wire up ffmpeg, and set up the ElevenLabs API key. Then read skills/video-use/SKILL.md for daily usage, and always read skills/video-use/helpers/ because that's where the editing scripts live. After install, don't transcribe anything on your own — just tell me it's ready and wait for me to drop footage into a folder.
 ```
-
-The agent handles the clone, dependencies, skill registration, and prompts you once for your ElevenLabs API key (grab one at [elevenlabs.io/app/settings/api-keys](https://elevenlabs.io/app/settings/api-keys)).
 
 Then point your agent at a folder of raw takes:
 
@@ -39,33 +58,37 @@ cd /path/to/your/videos
 claude    # or codex, hermes, etc.
 ```
 
-For always-on editing from your own VPS or Telegram, run the agent through [Browser Use Box](https://browser-use.com/bux). [Watch the 15-second demo](https://www.tiktok.com/@browser_use/video/7639824093721758989).
-
 And in the session:
 
 > edit these into a launch video
 
 It inventories the sources, proposes a strategy, waits for your OK, then produces `edit/final.mp4` next to your sources. All outputs live in `<videos_dir>/edit/` — the skill directory stays clean.
 
-## Manual install
-
-If you'd rather do it by hand:
+## Manual install (other agents)
 
 ```bash
-# 1. Clone and symlink into your agent's skills directory
-git clone https://github.com/browser-use/video-use ~/Developer/video-use
-ln -sfn ~/Developer/video-use ~/.claude/skills/video-use        # Claude Code
-# ln -sfn ~/Developer/video-use ~/.codex/skills/video-use       # Codex
+# 1. Clone and symlink the skill folder into your agent's skills directory
+git clone https://github.com/cryptogus056-beep/video-use ~/Developer/video-use
+ln -sfn ~/Developer/video-use/skills/video-use ~/.codex/skills/video-use   # Codex
 
 # 2. Install deps
-cd ~/Developer/video-use
-uv sync                         # or: pip install -e .
+pip install requests librosa matplotlib pillow numpy
 brew install ffmpeg             # required
 brew install yt-dlp             # optional, for downloading online sources
 
-# 3. Add your ElevenLabs API key
-cp .env.example .env
-$EDITOR .env                    # ELEVENLABS_API_KEY=...
+# 3. Add your ElevenLabs API key (outside the repo)
+mkdir -p ~/.config/video-use
+printf 'ELEVENLABS_API_KEY=%s\n' 'your-key' > ~/.config/video-use/.env
+chmod 600 ~/.config/video-use/.env
+```
+
+## Repository layout
+
+```
+.claude-plugin/          plugin.json + marketplace.json (Claude Code plugin)
+skills/video-use/        SKILL.md + helpers/ (the editing scripts)
+skills/manim-video/      vendored Manim skill, used for Manim animation slots
+tests/                   unit tests for helpers/render.py
 ```
 
 ## How it works
@@ -109,4 +132,4 @@ The self-eval loop runs `timeline_view` on the _rendered output_ at every cut bo
 4. **Zero assumptions about content type.** Look, ask, then edit.
 5. **12 hard rules, artistic freedom elsewhere.** Production-correctness is non-negotiable. Taste isn't.
 
-See [`SKILL.md`](./SKILL.md) for the full production rules and editing craft.
+See [`skills/video-use/SKILL.md`](./skills/video-use/SKILL.md) for the full production rules and editing craft.
